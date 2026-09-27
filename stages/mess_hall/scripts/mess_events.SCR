@@ -81,34 +81,19 @@ ENEMY_2  SEARCH_PATH  ROUTE_EAST
 ENEMY_1  LINE  "Where did he go? Check under the tables!"
 
 ;===========================================================================
-; EVENT: Entry from west — guard reacts to door opening
+; EVENT: Entry from B2 corridor door (east wall)
+; Guard at kitchen counter turns toward the door when it opens.
 ;===========================================================================
 
 [EVENT  EVENT_0x10]
 CHECK_FLAG  ALERT_STATE
-IF_SET  SKIP_TO END_WEST_ENTRY
+IF_SET  SKIP_TO END_B2_ENTRY
 
-ENEMY_0  TURN_TO  EXIT_WEST
+ENEMY_0  TURN_TO  EXIT_B2_CORRIDOR
 ENEMY_0  LINE  "...Someone coming in?"
 WAIT  d45
 ENEMY_0  TURN_TO  FACING_DEFAULT
 GUARD_STATE  NORMAL
 
-LABEL  END_WEST_ENTRY
-NOP
-
-;===========================================================================
-; EVENT: Entry from east — mirror of 0x10
-;===========================================================================
-
-[EVENT  EVENT_0x11]
-CHECK_FLAG  ALERT_STATE
-IF_SET  SKIP_TO END_EAST_ENTRY
-
-ENEMY_0  TURN_TO  EXIT_EAST
-WAIT  d45
-ENEMY_0  TURN_TO  FACING_DEFAULT
-GUARD_STATE  NORMAL
-
-LABEL  END_EAST_ENTRY
+LABEL  END_B2_ENTRY
 NOP

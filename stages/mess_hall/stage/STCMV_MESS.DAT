@@ -33,34 +33,26 @@ QUAD  (-12.0, 0.0,  8.0)   (12.0, 0.0,  8.0)
   TEX  mess_walls.TIM  TILE  0x02  ; painted cinder block
   COL_FLAGS  SOLID
 
-; South wall — two panels around exits
-QUAD  (-12.0, 0.0, -8.0)   (-2.0,  0.0, -8.0)
-      ( -2.0, 3.5, -8.0)   (-12.0, 3.5, -8.0)
+; South wall — solid (no exit here)
+QUAD  (-12.0, 0.0, -8.0)   (12.0,  0.0, -8.0)
+      ( 12.0, 3.5, -8.0)   (-12.0, 3.5, -8.0)
   TEX  mess_walls.TIM  TILE  0x02
   COL_FLAGS  SOLID
 
-QUAD  (  2.0, 0.0, -8.0)   (12.0,  0.0, -8.0)
-      ( 12.0, 3.5, -8.0)   (  2.0, 3.5, -8.0)
+; West wall — solid (no exit here)
+QUAD  (-12.0, 0.0,  -8.0)  (-12.0, 0.0,  8.0)
+      (-12.0, 3.5,   8.0)  (-12.0, 3.5, -8.0)
   TEX  mess_walls.TIM  TILE  0x02
   COL_FLAGS  SOLID
 
-; West wall — one panel around exit
-QUAD  (-12.0, 0.0,  -8.0)  (-12.0, 0.0, -5.5)
-      (-12.0, 3.5,  -5.5)  (-12.0, 3.5, -8.0)
-  TEX  mess_walls.TIM  TILE  0x02
-  COL_FLAGS  SOLID
-
-QUAD  (-12.0, 0.0,  -4.5)  (-12.0, 0.0,  8.0)
-      (-12.0, 3.5,   8.0)  (-12.0, 3.5, -4.5)
-  TEX  mess_walls.TIM  TILE  0x02
-  COL_FLAGS  SOLID
-
-; East wall — one panel around exit
-QUAD  (12.0, 0.0,  -8.0)   (12.0, 0.0, -5.5)
+; East wall — door opening at z=-5.5 to z=-8.0 (connects to NWSB B2 corridor)
+; Upper panel above door
+QUAD  (12.0, 2.5,  -8.0)   (12.0, 2.5, -5.5)
       (12.0, 3.5,  -5.5)   (12.0, 3.5, -8.0)
   TEX  mess_walls.TIM  TILE  0x02
   COL_FLAGS  SOLID
 
+; Wall panel north of door
 QUAD  (12.0, 0.0,  -4.5)   (12.0, 0.0,  8.0)
       (12.0, 3.5,   8.0)   (12.0, 3.5, -4.5)
   TEX  mess_walls.TIM  TILE  0x02
@@ -124,9 +116,8 @@ PROP  TRAY_SINGLE  ( 8.0, 0.76, -1.5)   mess_props.TIM  0x21
 ; SECTION 6 — EXIT DOOR FRAMES
 ;===========================================================================
 [MESH_DOORS]
-; West exit door frame
-DOOR_FRAME  (-12.0, 0.0, -6.5)  WIDTH f2.5  HEIGHT f2.5  AXIS_X  mess_walls.TIM  0x03
-; East exit door frame
-DOOR_FRAME  ( 12.0, 0.0, -6.5)  WIDTH f2.5  HEIGHT f2.5  AXIS_X  mess_walls.TIM  0x03
-; South exits (two smaller service doors)
-DOOR_FRAME  ( -1.25, 0.0, -8.0) WIDTH f2.5  HEIGHT f2.5  AXIS_Z  mess_walls.TIM  0x03
+; Single entry/exit door on east wall — connects to NWSB B2 grating corridor
+; Positioned at the X mark in the screenshot: between the two large pipe runs,
+; east of the central stairwell, south segment of the grating floor.
+; Door frame is flush with the east wall (x=12.0), centred at z=-6.75.
+DOOR_FRAME  (12.0, 0.0, -6.75)  WIDTH f2.0  HEIGHT f2.5  AXIS_X  mess_walls.TIM  0x03

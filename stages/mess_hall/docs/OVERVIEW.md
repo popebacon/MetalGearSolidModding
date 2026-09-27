@@ -5,14 +5,15 @@ Stage ID: `j75jh3` (STAGE_MESS_HALL)
 ## Lore Reference
 
 Otacon mentions the mess hall during a Codec call with Snake on Shadow Moses Island.
-The soldiers take their meals in a single large dining area on the underground base's
-B2 level, adjacent to the communications towers access corridor. This stage brings
-that space to life as a traversable environment.
+The soldiers take their meals in a single large dining area off the B2 grating
+corridor of the **Nuclear Warhead Storage Building**, accessed through a door on the
+east wall of the corridor — between the two large pipe runs, east of the central
+stairwell. This stage brings that space to life as a traversable environment.
 
 ## Layout Overview
 
 ```
-  [NORTH WALL]
+  [NORTH WALL — kitchen side]
   +------------------------------------------+
   |  Kitchen / Serving Counter (raised 0.5m) |
   |  [TABLE A]  [TABLE B]  [TABLE C]          |
@@ -21,12 +22,24 @@ that space to life as a traversable environment.
   |                                           |
   |  [TABLE G]  [TABLE H]  [TABLE I]          |
   |                                           |
-  |  EXIT WEST          EXIT EAST             |
+  |                              [DOOR >>>]  |  ← east wall, to NWSB B2 corridor
   +------------------------------------------+
-  [SOUTH WALL]
+  [SOUTH WALL — solid]
 
 Room dimensions: 24m x 16m x 3.5m (W x D x H)
+Single entry/exit on east wall (x=12.0, z=-6.75), 2.0m wide × 2.5m tall.
 ```
+
+## Connection Point
+
+The door sits on the east wall of the mess hall, opening into the **B2 grating
+corridor of the Nuclear Warhead Storage Building**, between the two large horizontal
+pipe runs visible east of the central stairwell. The X mark on the reference
+screenshot pins the door between those pipe runs on the south segment of the
+grating floor.
+
+In-game flow: Snake descends to B2 via the stairwell, moves east past the pipes,
+and the door is on the left-hand (south) wall of the grating corridor.
 
 ## Files
 
@@ -49,7 +62,10 @@ Room dimensions: 24m x 16m x 3.5m (W x D x H)
    - `STCMV_MESS.HDR` → matching header slot
 3. Copy `mess_walls.TIM` and `mess_props.TIM` into the texture archive.
 4. Inject `mess_codec.SCR` and `mess_events.SCR` via the script patcher.
-5. Add a room-transition trigger from the desired corridor stage to `STAGE_MESS_HALL`.
+5. Patch the **NWSB B2 corridor stage** (`0x09`) to add a door trigger on its east
+   wall at the X mark position (between the two pipe runs, south of stairwell):
+   - Add `DOOR_TRIGGER` at the corridor's local coordinates for that wall segment
+   - Set target to `STAGE_MESS_HALL` (0x48), `target_spawn = 0x00`
 
 ## Camera Volumes
 

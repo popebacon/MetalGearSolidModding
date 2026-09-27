@@ -21,14 +21,18 @@ CEILING_Y       = f3.5
 
 [SPAWN_POINTS]
 ; id, x, z, facing_angle (degrees, 0=north)
-SPAWN_0         = 0x00,  f-1.0, f-7.5, 90   ; from west corridor
-SPAWN_1         = 0x01,  f13.0, f-7.5, 270  ; from east corridor
-SPAWN_ALERT     = 0x02,  f6.0,  f0.0,  180  ; guard reinforcement drop
+; SPAWN_0: Snake enters from B2 grating corridor (east side of stairwell,
+;          Nuclear Warhead Storage Building). Door is flush with the east wall
+;          of the corridor, between the two pipe runs visible in the screenshot.
+SPAWN_0         = 0x00,  f11.5, f-7.5, 270  ; from B2 NWSB corridor (east wall)
+SPAWN_ALERT     = 0x01,  f0.0,  f0.0,  180  ; guard reinforcement from stairwell above
 
 [EXITS]
 ; id, x, z, width, target_stage, target_spawn
-EXIT_WEST       = 0x00,  f-12.0, f-7.5, f2.5, 0x1A, 0x01
-EXIT_EAST       = 0x01,  f12.0,  f-7.5, f2.5, 0x1B, 0x00
+; EXIT_B2_CORRIDOR: returns to NWSB B2 grating corridor east of stairwell
+;   target_stage 0x09 = NWSB_B2 (vanilla stage ID for that corridor segment)
+;   target_spawn 0x03 = spawn point just west of the door on the B2 side
+EXIT_B2_CORRIDOR = 0x00,  f12.0, f-7.5, f2.0, 0x09, 0x03
 
 [CAMERA_VOLUMES]
 ; id, x_min, x_max, z_min, z_max, cam_type, pitch, yaw, fov
@@ -39,8 +43,8 @@ CAM_MESS_C      = 0x02,  f0.0,   f12.0,  f-8.0, f8.0,  FIXED, f55.0, f0.0,  f60.
 [COLLISION_GROUPS]
 ; walls, floor, ceiling baked into geometry DAT
 ; additional trigger volumes listed here
-TRIGGER_ENTRY_WEST  = VOLUME, f-10.0, f-6.0,  f-9.5, f-5.5,  EVENT_0x10
-TRIGGER_ENTRY_EAST  = VOLUME, f9.0,   f-6.0,  f-9.5, f-5.5,  EVENT_0x11
+; Single entry from B2 corridor (east wall door)
+TRIGGER_ENTRY_B2    = VOLUME, f9.0,   f12.0,  f-9.5, f-5.5,  EVENT_0x10
 TRIGGER_CODEC       = VOLUME, f-2.0,  f2.0,   f6.0,  f8.0,   CODEC_0x20
 
 [LIGHTING]
