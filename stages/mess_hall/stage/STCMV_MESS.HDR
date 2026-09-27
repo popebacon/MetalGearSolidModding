@@ -1,0 +1,52 @@
+; STCMV_MESS.HDR — Mess Hall Stage Header
+; Metal Gear Solid (PC/GOG) custom stage header format
+; Values are hex unless prefixed with 'd' (decimal) or 'f' (float)
+;
+; Format mirrors vanilla stage headers found in STAGE.DAT.
+; Offsets relative to header block start.
+
+[STAGE_INFO]
+STAGE_ID        = 0x48          ; custom slot 72
+STAGE_NAME      = "MESS_HALL"
+STAGE_FLAGS     = 0x0003        ; bit0=indoor, bit1=base-interior
+BG_MUSIC_ID     = 0x06          ; "Enclosure" — tense ambient loop
+AMBIENT_SFX_ID  = 0x1C          ; cafeteria HVAC / distant chatter
+
+[DIMENSIONS]
+ROOM_WIDTH      = f24.0         ; metres
+ROOM_DEPTH      = f16.0
+ROOM_HEIGHT     = f3.5
+FLOOR_Y         = f0.0
+CEILING_Y       = f3.5
+
+[SPAWN_POINTS]
+; id, x, z, facing_angle (degrees, 0=north)
+SPAWN_0         = 0x00,  f-1.0, f-7.5, 90   ; from west corridor
+SPAWN_1         = 0x01,  f13.0, f-7.5, 270  ; from east corridor
+SPAWN_ALERT     = 0x02,  f6.0,  f0.0,  180  ; guard reinforcement drop
+
+[EXITS]
+; id, x, z, width, target_stage, target_spawn
+EXIT_WEST       = 0x00,  f-12.0, f-7.5, f2.5, 0x1A, 0x01
+EXIT_EAST       = 0x01,  f12.0,  f-7.5, f2.5, 0x1B, 0x00
+
+[CAMERA_VOLUMES]
+; id, x_min, x_max, z_min, z_max, cam_type, pitch, yaw, fov
+CAM_MESS_A      = 0x00,  f-12.0, f0.0,   f-8.0, f8.0,  FIXED, f55.0, f0.0,  f60.0
+CAM_MESS_B      = 0x01,  f-12.0, f12.0,  f-2.0, f4.0,  FIXED, f55.0, f0.0,  f60.0
+CAM_MESS_C      = 0x02,  f0.0,   f12.0,  f-8.0, f8.0,  FIXED, f55.0, f0.0,  f60.0
+
+[COLLISION_GROUPS]
+; walls, floor, ceiling baked into geometry DAT
+; additional trigger volumes listed here
+TRIGGER_ENTRY_WEST  = VOLUME, f-10.0, f-6.0,  f-9.5, f-5.5,  EVENT_0x10
+TRIGGER_ENTRY_EAST  = VOLUME, f9.0,   f-6.0,  f-9.5, f-5.5,  EVENT_0x11
+TRIGGER_CODEC       = VOLUME, f-2.0,  f2.0,   f6.0,  f8.0,   CODEC_0x20
+
+[LIGHTING]
+AMBIENT_COLOR   = 0xC0B090     ; warm incandescent
+SUN_DIR         = f0.0, f-1.0, f0.0   ; straight down (interior)
+SHADOW_MODE     = STATIC
+LIGHT_0         = POINT, f-8.0, f3.2, f4.0,  0xFFE8C0, f6.0
+LIGHT_1         = POINT, f0.0,  f3.2, f0.0,  0xFFE8C0, f6.0
+LIGHT_2         = POINT, f8.0,  f3.2, f-4.0, 0xFFE8C0, f6.0

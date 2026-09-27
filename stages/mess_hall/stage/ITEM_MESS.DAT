@@ -1,0 +1,54 @@
+; ITEM_MESS.DAT — Item placements for Mess Hall
+; Format: ITEM blocks
+; Item IDs match MGS1 PC internal item table.
+
+;===========================================================================
+; ITEMS
+;===========================================================================
+
+[ITEM_0]
+; Ration hidden under a bench (TABLE_C2, south bench)
+ITEM_ID     = 0x01          ; RATION
+X           = f0.0
+Z           = f-2.2
+Y           = f0.0
+VISIBLE     = FALSE         ; hidden (crawl to find)
+RESPAWN     = TRUE
+
+[ITEM_1]
+; FAMAS ammo on the kitchen counter (makes sense in a military base)
+ITEM_ID     = 0x22          ; FAMAS_AMMO
+X           = f-6.0
+Z           = f7.0
+Y           = f0.95
+VISIBLE     = TRUE
+RESPAWN     = FALSE
+
+[ITEM_2]
+; Second FAMAS ammo, east counter
+ITEM_ID     = 0x22
+X           = f6.0
+Z           = f7.0
+Y           = f0.95
+VISIBLE     = TRUE
+RESPAWN     = FALSE
+
+[ITEM_3]
+; Stun grenades in a tray on a table — guards left them during their meal
+ITEM_ID     = 0x31          ; STUN_GRENADE (x2)
+X           = f-8.0
+Z           = f4.8
+Y           = f0.76
+VISIBLE     = TRUE
+RESPAWN     = FALSE
+
+[ITEM_4]
+; Ketchup bottle (special item — can be used to fake death)
+; Hidden on the back shelf behind the counter
+ITEM_ID     = 0x50          ; KETCHUP
+X           = f2.0
+Z           = f7.6
+Y           = f0.95
+VISIBLE     = FALSE
+RESPAWN     = FALSE
+NOTE        = "Otacon hid it here. He mentions it if you call him after picking it up."

@@ -1,0 +1,73 @@
+; mess_codec.SCR — Codec trigger script for the Mess Hall stage
+; Fires when Snake enters the TRIGGER_CODEC volume (near kitchen counter)
+; Uses MGS1 PC script opcode format.
+;
+; Opcodes reference:
+;   CALL_CODEC  <freq>, <speaker>, <anim>   — open codec window
+;   DIALOGUE    <string_id>                 — play/display line
+;   WAIT_INPUT                              — wait for player to press action
+;   END_CALL                                — close codec window
+;   SET_FLAG    <flag_id>                   — mark event as seen
+
+;===========================================================================
+; EVENT: CODEC_0x20 — Otacon calls when Snake reaches the counter
+; Fires once per playthrough (FLAG_MESS_CODEC_SEEN gates it)
+;===========================================================================
+
+[EVENT  CODEC_0x20]
+CHECK_FLAG  FLAG_MESS_CODEC_SEEN
+IF_SET      SKIP_TO END_CODEC_0x20
+
+CALL_CODEC  140.85  OTACON  CODEC_ANIM_ADJUST_GLASSES
+
+DIALOGUE    "Hey, Snake — you found the mess hall."
+WAIT_INPUT
+
+DIALOGUE    "The soldiers eat here in rotating shifts. Breakfast is at 0600, lunch at 1200, dinner at 1800. They get forty minutes each."
+WAIT_INPUT
+
+DIALOGUE    "The kitchen's fully stocked — they keep a lot of rations on site. Cold weather makes people eat more, I guess."
+WAIT_INPUT
+
+DIALOGUE    "I actually snuck in here once, before... before everything went wrong. I was trying to get to the communications tower."
+WAIT_INPUT
+
+DIALOGUE    "The food was terrible, by the way. Government-issue everything. But I grabbed a ketchup bottle — the real kind, not the packets."
+WAIT_INPUT
+
+DIALOGUE    "...I hid it somewhere in here, actually. You might want to hold onto it. Trust me."
+WAIT_INPUT
+
+END_CALL
+
+SET_FLAG    FLAG_MESS_CODEC_SEEN
+
+LABEL  END_CODEC_0x20
+NOP
+
+;===========================================================================
+; EVENT: CODEC_0x21 — Optional follow-up if Snake calls Otacon in this room
+; Triggered by player manually calling 140.85 while FLAG_MESS_CODEC_SEEN is set
+;===========================================================================
+
+[EVENT  CODEC_0x21]
+CHECK_FLAG  FLAG_MESS_CODEC_SEEN
+IF_NOT_SET  SKIP_TO END_CODEC_0x21
+
+CALL_CODEC  140.85  OTACON  CODEC_ANIM_THINKING
+
+CHECK_FLAG  FLAG_KETCHUP_COLLECTED
+IF_SET      GOTO  CODEC_0x21_KETCHUP
+
+DIALOGUE    "You're still in the mess hall? Watch out for the guard on the far side — he has a wider patrol at mealtime."
+WAIT_INPUT
+GOTO END_CODEC_0x21
+
+LABEL  CODEC_0x21_KETCHUP
+DIALOGUE    "Oh, you found it! The ketchup. Good. I hope you know what to do with it. ...Don't eat it."
+WAIT_INPUT
+
+END_CALL
+
+LABEL  END_CODEC_0x21
+NOP

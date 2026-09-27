@@ -1,0 +1,27 @@
+; mess_walls.TIM — Wall, floor, and ceiling texture sheet spec
+; Actual TIM2 binary must be created with a tool such as Tim2View or ps2dev's
+; texconv. This file describes each tile slot for artists.
+;
+; Sheet size: 256x256, 4bpp paletted (16 colours), TIM2 container.
+; Each TILE is 64x64 pixels.
+
+TILE 0x00  "floor_concrete"
+  Description: Rough poured concrete with subtle grime lines.
+               Colour: mid grey (0x88,0x86,0x84) with dark grout seams.
+               Tiling: 2x repeat per 1m². Use with UV scale 0.5.
+
+TILE 0x01  "ceiling_panel"
+  Description: Dropped acoustic ceiling tile with recessed fluorescent fixture strip.
+               Colour: off-white (0xE8,0xE6,0xDC) with faint yellowing toward edges.
+               Fluorescent strip: 8px bright band down centre.
+
+TILE 0x02  "cinder_block_painted"
+  Description: Standard military-base painted cinder block.
+               Base paint: pale grey-green (0xA0,0xA8,0x98).
+               Block seams: darker (0x70,0x78,0x68), 4px wide.
+               Occasional scuff marks at waist height.
+
+TILE 0x03  "door_frame_metal"
+  Description: Brushed steel door frame with riveted edge strip.
+               Colour: dark steel (0x60,0x62,0x68) with specular streak.
+               Rivet row: 4px dots every 12px.

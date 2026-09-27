@@ -1,0 +1,80 @@
+; ENEMY_MESS.DAT — Enemy placement and patrol routes for Mess Hall
+; Format: ENEMY blocks, then PATROL_ROUTE blocks
+; Guard model IDs and AI constants match vanilla MGS1 PC values.
+
+;===========================================================================
+; GUARD DEFINITIONS
+;===========================================================================
+
+[ENEMY_0]
+; Stationed guard — stands near kitchen counter watching the room
+MODEL_ID    = 0x02              ; standard genome soldier (Shadow Moses indoor)
+SPAWN_X     = f0.0
+SPAWN_Z     = f6.0
+SPAWN_Y     = f0.0
+FACING      = 180               ; facing south (toward tables)
+PATROL      = NONE
+IDLE_ANIM   = ARMS_CROSSED      ; leaning on counter
+ALERT_LEVEL = NORMAL
+VISION_ARC  = 120               ; degrees
+VISION_RANGE= f12.0             ; metres
+EQUIP       = FAMAS | STUN_GRENADE
+
+[ENEMY_1]
+; Patrolling guard — west half of room
+MODEL_ID    = 0x02
+SPAWN_X     = f-8.0
+SPAWN_Z     = f-4.0
+SPAWN_Y     = f0.0
+FACING      = 90
+PATROL      = ROUTE_WEST
+ALERT_LEVEL = NORMAL
+VISION_ARC  = 90
+VISION_RANGE= f10.0
+EQUIP       = FAMAS
+
+[ENEMY_2]
+; Patrolling guard — east half of room
+MODEL_ID    = 0x02
+SPAWN_X     = f8.0
+SPAWN_Z     = f4.0
+SPAWN_Y     = f0.0
+FACING      = 270
+PATROL      = ROUTE_EAST
+ALERT_LEVEL = NORMAL
+VISION_ARC  = 90
+VISION_RANGE= f10.0
+EQUIP       = FAMAS
+
+;===========================================================================
+; PATROL ROUTES
+;===========================================================================
+
+[PATROL_ROUTE  ROUTE_WEST]
+; Guard walks a simple L-shape through the west tables
+NODE_0   = f-8.0,  f-4.0,  WAIT d120   ; south-west, pause 2 sec
+NODE_1   = f-8.0,  f4.5,   WAIT d60    ; north-west table row
+NODE_2   = f-4.0,  f4.5,   WAIT d30    ; toward centre
+NODE_3   = f-4.0,  f-4.0,  WAIT d60    ; back south
+LOOP
+
+[PATROL_ROUTE  ROUTE_EAST]
+; Mirrored pattern for east guard
+NODE_0   = f8.0,   f4.0,   WAIT d120
+NODE_1   = f8.0,   f-1.5,  WAIT d60
+NODE_2   = f4.0,   f-1.5,  WAIT d30
+NODE_3   = f4.0,   f4.0,   WAIT d60
+LOOP
+
+;===========================================================================
+; ALERT BEHAVIOUR
+;===========================================================================
+
+[ALERT_CONFIG]
+; On ALERT all guards converge to room centre and take cover behind tables
+ALERT_COVER_0   = f-8.0,  f1.5,  CROUCH   ; behind Table B1
+ALERT_COVER_1   = f0.0,   f1.5,  CROUCH   ; behind Table B2
+ALERT_COVER_2   = f8.0,   f1.5,  CROUCH   ; behind Table B3
+REINFORCEMENT_STAGE  = 0x1A               ; spawn from west corridor
+REINFORCEMENT_COUNT  = d2
+REINFORCEMENT_DELAY  = d300               ; frames (~5 sec)

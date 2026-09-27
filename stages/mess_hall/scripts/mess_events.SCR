@@ -1,0 +1,114 @@
+; mess_events.SCR — Guard dialogue, ambient events, and alert behaviours
+; for the Mess Hall stage.
+
+;===========================================================================
+; AMBIENT: Guard idle chatter (fires randomly, non-alert state only)
+;===========================================================================
+
+[EVENT  AMBIENT_GUARD_CHAT]
+CHECK_FLAG  ALERT_STATE
+IF_SET      SKIP_TO END_AMBIENT
+
+; Pick a random dialogue line from pool every 600-900 frames
+RANDOM_WAIT  d600  d900
+RANDOM_DIALOGUE  ENEMY_0  IDLE_LINES
+WAIT_INPUT_OR_TIMEOUT  d180
+
+LABEL  END_AMBIENT
+NOP
+
+[STRING_TABLE  IDLE_LINES]
+0x00  "This food again. How many nights in a row is it beef stew?"
+0x01  "I heard the new batch of recruits arrives next week."
+0x02  "My feet are killing me. I've been on since 0400."
+0x03  "You see the game last night? ...Right. No TV out here."
+0x04  "Colonel keeps cutting the heat. I've got my thermal on under this uniform."
+
+;===========================================================================
+; EVENT: Guard notices something (knocked-over tray, etc.)
+; Triggered by physics interaction with TRAY_SINGLE items
+;===========================================================================
+
+[EVENT  GUARD_HEARS_TRAY  ENEMY_1  ENEMY_2]
+CHECK_ALERT_RANGE  f6.0
+IF_OUT_OF_RANGE  SKIP_TO END_TRAY_EVENT
+
+ENEMY_LINE  "Hm? ...Probably just rats."
+GUARD_STATE  CAUTION  d300
+TURN_TO_SOUND_SOURCE
+WAIT  d90
+GUARD_STATE  NORMAL
+
+LABEL  END_TRAY_EVENT
+NOP
+
+;===========================================================================
+; EVENT: Alert sequence — guards take cover behind tables
+;===========================================================================
+
+[EVENT  ALERT_MESS_HALL]
+GUARD_STATE  ALERT
+
+ENEMY_0  MOVE_TO_COVER  ALERT_COVER_0  RUN
+ENEMY_1  MOVE_TO_COVER  ALERT_COVER_1  RUN
+ENEMY_2  MOVE_TO_COVER  ALERT_COVER_2  RUN
+
+; Kitchen guard shouts an alert line
+ENEMY_0  LINE  "Intruder in the mess hall! Don't let him escape!"
+WAIT  d60
+
+; Start suppressive fire once in cover
+ENEMY_0  AI_STATE  SUPPRESS_FIRE
+ENEMY_1  AI_STATE  SUPPRESS_FIRE
+ENEMY_2  AI_STATE  SUPPRESS_FIRE
+
+; Reinforcements called from corridor after delay
+WAIT  d300
+SPAWN_REINFORCEMENT  0x1A  0x02  d2
+
+;===========================================================================
+; EVENT: Evasion sequence — guards spread out to search
+;===========================================================================
+
+[EVENT  EVASION_MESS_HALL]
+ENEMY_0  AI_STATE  SEARCH
+ENEMY_1  AI_STATE  SEARCH
+ENEMY_2  AI_STATE  SEARCH
+
+ENEMY_0  SEARCH_PATH  ROUTE_WEST
+ENEMY_2  SEARCH_PATH  ROUTE_EAST
+
+ENEMY_1  LINE  "Where did he go? Check under the tables!"
+
+;===========================================================================
+; EVENT: Entry from west — guard reacts to door opening
+;===========================================================================
+
+[EVENT  EVENT_0x10]
+CHECK_FLAG  ALERT_STATE
+IF_SET  SKIP_TO END_WEST_ENTRY
+
+ENEMY_0  TURN_TO  EXIT_WEST
+ENEMY_0  LINE  "...Someone coming in?"
+WAIT  d45
+ENEMY_0  TURN_TO  FACING_DEFAULT
+GUARD_STATE  NORMAL
+
+LABEL  END_WEST_ENTRY
+NOP
+
+;===========================================================================
+; EVENT: Entry from east — mirror of 0x10
+;===========================================================================
+
+[EVENT  EVENT_0x11]
+CHECK_FLAG  ALERT_STATE
+IF_SET  SKIP_TO END_EAST_ENTRY
+
+ENEMY_0  TURN_TO  EXIT_EAST
+WAIT  d45
+ENEMY_0  TURN_TO  FACING_DEFAULT
+GUARD_STATE  NORMAL
+
+LABEL  END_EAST_ENTRY
+NOP

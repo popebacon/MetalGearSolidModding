@@ -1,0 +1,30 @@
+; mess_props.TIM — Prop texture sheet spec (tables, benches, trays, counter)
+; Sheet size: 256x256, 4bpp paletted, TIM2 container.
+
+TILE 0x10  "counter_stainless"
+  Description: Brushed stainless-steel counter surface.
+               Base: light silver (0xCC,0xCC,0xCE), directional brush marks.
+               Edge bevel: 3px dark strip.
+
+TILE 0x11  "counter_fascia"
+  Description: Counter front panel — painted steel with faint dent marks.
+               Colour: olive drab (0x78,0x80,0x60), same green as base lockers.
+
+TILE 0x12  "table_laminate"
+  Description: Military-issue folding table surface with scratched laminate.
+               Colour: cream/tan (0xD4,0xCC,0xB0) with brown scratch patterns.
+               Metal frame edge: 4px steel strip.
+
+TILE 0x13  "table_leg_metal"
+  Description: Square tube steel table leg.
+               Colour: flat grey (0x70,0x70,0x72), slight rust at floor contact.
+
+TILE 0x20  "tray_stack"
+  Description: Stack of 4 grey plastic food trays seen from above.
+               Each tray 64x48px top view, staggered 2px offsets.
+               Colour: dark grey-green (0x5A,0x60,0x54).
+
+TILE 0x21  "tray_single"
+  Description: Single tray top-down with remnants of a meal.
+               Tray: same grey-green. Compartments filled:
+                 left large: brown (beef stew), right: white (rice), small: grey (bread).
