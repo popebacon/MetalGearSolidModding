@@ -8,7 +8,7 @@ setlocal
 :: ============================================================
 
 set MOD_DIR=G:\Program Files (x86)\GOG Galaxy\Games\Metal Gear Solid - Modded
-set STAGE_SRC=%~dp0..\stages\mess_hall
+set STAGE_SRC=%~dp0..\stages\s21a
 
 echo.
 echo Metal Gear Solid - Mess Hall Stage Injector

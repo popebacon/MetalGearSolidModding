@@ -1,6 +1,6 @@
 # Mess Hall / Dining Area — Custom Stage
 
-Stage ID: `j75jh3` (STAGE_MESS_HALL)
+Stage ID: `s21a`
 
 ## Lore Reference
 
@@ -58,14 +58,14 @@ and the door is on the left-hand (south) wall of the grating corridor.
 
 1. Back up your original `STAGE.DAT` and `STAGE.HDR` in the GOG install folder.
 2. Use **VR-Disc Patcher** (or equivalent DAT injector) to inject:
-   - `STCMV_MESS.DAT` → slot `0x48` (first free custom slot)
-   - `STCMV_MESS.HDR` → matching header slot
+   - `STCMV_MESS.DAT` → stage folder `s21a` in `STAGE.mgz`
+   - `STCMV_MESS.HDR` → same folder
 3. Copy `mess_walls.TIM` and `mess_props.TIM` into the texture archive.
 4. Inject `mess_codec.SCR` and `mess_events.SCR` via the script patcher.
-5. Patch the **NWSB B2 corridor stage** (`0x09`) to add a door trigger on its east
+5. Patch the **NWSB B2 corridor stage** (`s09a`) to add a door trigger on its east
    wall at the X mark position (between the two pipe runs, south of stairwell):
    - Add `DOOR_TRIGGER` at the corridor's local coordinates for that wall segment
-   - Set target to `STAGE_MESS_HALL` (0x48), `target_spawn = 0x00`
+   - Set target to `s21a`, `target_spawn = 0x00`
 
 ## Camera Volumes
 

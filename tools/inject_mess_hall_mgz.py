@@ -1,12 +1,12 @@
 """
 inject_mess_hall_mgz.py
-Adds the Mess Hall stage files into an existing STAGE.mgz (PC/GOG version).
+Adds the Mess Hall stage (s21a) into an existing STAGE.mgz (PC/GOG version).
 
 Usage:
-    python inject_mess_hall_mgz.py <path_to_STAGE.mgz> <path_to_mess_hall_folder>
+    python inject_mess_hall_mgz.py <path_to_STAGE.mgz> <path_to_s21a_folder>
 
 Example:
-    python inject_mess_hall_mgz.py "G:\\...\\STAGE.mgz" "C:\\...\\stages\\mess_hall"
+    python inject_mess_hall_mgz.py "G:\\...\\STAGE.mgz" "C:\\...\\stages\\s21a"
 
 A backup of the original is saved as STAGE.mgz.bak before any changes are made.
 """
@@ -16,9 +16,9 @@ import shutil
 import sys
 import os
 
-STAGE_NAME = "mess_hall"
+STAGE_NAME = "s21a"
 
-# Files to inject and where to find them relative to the mess_hall folder
+# Files to inject and where to find them relative to the s21a folder
 INJECT_FILES = [
     ("stage/STCMV_MESS.DAT", f"stage/{STAGE_NAME}/STCMV_MESS.DAT"),
     ("stage/STCMV_MESS.HDR", f"stage/{STAGE_NAME}/STCMV_MESS.HDR"),
@@ -50,24 +50,24 @@ def list_stages(mgz_path):
     return stages
 
 
-def inject(mgz_path, mess_hall_dir, dry_run=False):
+def inject(mgz_path, stage_dir, dry_run=False):
     # Resolve paths
     mgz_path = os.path.abspath(mgz_path)
-    mess_hall_dir = os.path.abspath(mess_hall_dir)
+    stage_dir = os.path.abspath(stage_dir)
     backup_path = mgz_path + ".bak"
     out_path = mgz_path + ".new"
 
     if not os.path.isfile(mgz_path):
         print(f"ERROR: {mgz_path} not found.")
         sys.exit(1)
-    if not os.path.isdir(mess_hall_dir):
-        print(f"ERROR: mess_hall folder not found: {mess_hall_dir}")
+    if not os.path.isdir(stage_dir):
+        print(f"ERROR: stage folder not found: {stage_dir}")
         sys.exit(1)
 
     # Verify source files exist
     missing = []
     for (local_rel, _) in INJECT_FILES:
-        full = os.path.join(mess_hall_dir, local_rel)
+        full = os.path.join(stage_dir, local_rel)
         if not os.path.isfile(full):
             missing.append(full)
     if missing:
@@ -90,7 +90,7 @@ def inject(mgz_path, mess_hall_dir, dry_run=False):
 
     print("Files to inject:")
     for (local_rel, zip_path) in INJECT_FILES:
-        full = os.path.join(mess_hall_dir, local_rel)
+        full = os.path.join(stage_dir, local_rel)
         size = os.path.getsize(full)
         print(f"  {zip_path}  ({size:,} bytes)")
 
@@ -108,14 +108,13 @@ def inject(mgz_path, mess_hall_dir, dry_run=False):
     shutil.copy2(mgz_path, backup_path)
     print(f"\nBackup saved: {backup_path}")
 
-    # Copy existing entries (skipping any old mess_hall entries) into new zip
+    # Copy existing entries (skipping any old s21a entries) into new zip
     skip_prefix = f"stage/{STAGE_NAME}/"
     skip_prefix2 = f"{STAGE_NAME}/"
 
     with zipfile.ZipFile(mgz_path, "r") as zin, \
          zipfile.ZipFile(out_path, "w", zipfile.ZIP_DEFLATED) as zout:
 
-        # Copy existing entries, skipping old mess_hall files
         kept = 0
         skipped = 0
         for item in zin.infolist():
@@ -126,10 +125,9 @@ def inject(mgz_path, mess_hall_dir, dry_run=False):
             zout.writestr(item, zin.read(item.filename))
             kept += 1
 
-        # Add new mess_hall files
         added = 0
         for (local_rel, zip_path) in INJECT_FILES:
-            full = os.path.join(mess_hall_dir, local_rel)
+            full = os.path.join(stage_dir, local_rel)
             zout.write(full, zip_path)
             print(f"  [OK] {zip_path}")
             added += 1
@@ -137,7 +135,7 @@ def inject(mgz_path, mess_hall_dir, dry_run=False):
     # Replace original with new file
     os.replace(out_path, mgz_path)
 
-    print(f"\nDone.  Kept {kept} existing entries, replaced {skipped} old mess_hall entries, added {added} new files.")
+    print(f"\nDone.  Kept {kept} existing entries, replaced {skipped} old {STAGE_NAME} entries, added {added} new files.")
     print(f"Output: {mgz_path}")
     print(f"Backup: {backup_path}")
 
@@ -158,9 +156,9 @@ if __name__ == "__main__":
         sys.exit(0)
 
     mgz = sys.argv[1]
-    mess_dir = sys.argv[2] if len(sys.argv) > 2 else os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), "..", "stages", "mess_hall"
+    stage_dir = sys.argv[2] if len(sys.argv) > 2 else os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "..", "stages", "s21a"
     )
     dry = "--dry" in sys.argv
 
-    inject(mgz, mess_dir, dry_run=dry)
+    inject(mgz, stage_dir, dry_run=dry)
