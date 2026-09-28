@@ -45,7 +45,19 @@ NTRAP_BLOCK_RE = re.compile(
 
 
 def find_gcx_path(z: zipfile.ZipFile) -> str | None:
-    for name in z.namelist():
+    names = z.namelist()
+    # Prefer exact stage folder match (s09a/scenerio.gcx) over variant (s09ar/…)
+    for name in names:
+        norm = name.replace("\\", "/")
+        parts = [p for p in norm.split("/") if p]
+        # match stage/s09a/scenerio.gcx  or  s09a/scenerio.gcx  (not s09ar)
+        if norm.endswith("scenerio.gcx"):
+            # pick the shortest path (most specific non-variant folder)
+            folder = parts[-2] if len(parts) >= 2 else ""
+            if not folder.endswith("r"):
+                return name
+    # fallback: any scenerio.gcx
+    for name in names:
         if name.replace("\\", "/").endswith("scenerio.gcx"):
             return name
     return None
