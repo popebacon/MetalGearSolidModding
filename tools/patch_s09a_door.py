@@ -67,10 +67,22 @@ def patch_gcx(text: str, x: int, z: int) -> str:
     door_line  = DOOR_LINE_TPL.format(dstrid=DOOR_STRID, x=x, z=z, mstrid=MODEL_STRID)
     ntrap_line = NTRAP_LINE_TPL.format(dstrid=DOOR_STRID, stage=TARGET_STAGE)
 
-    # Find insertion point for chara line: after last chara DOOR line
     chara_matches = list(CHARA_DOOR_RE.finditer(text))
     if not chara_matches:
-        raise ValueError("No existing 'chara … DOOR:' lines found — wrong GCX?")
+        # Debug: show all chara lines so we can see the actual format
+        all_chara = re.findall(r'^chara\b[^\n]*', text, re.MULTILINE)
+        if all_chara:
+            print("\nDEBUG: chara lines found (no DOOR: among them):")
+            for l in all_chara[:10]:
+                print(" ", repr(l))
+        else:
+            print("\nDEBUG: no 'chara' lines at all in GCX")
+        # Fall back: insert after last chara line of any kind
+        all_chara_m = list(re.finditer(r'^chara\b', text, re.MULTILINE))
+        if not all_chara_m:
+            raise ValueError("No 'chara' lines found in GCX — cannot determine insertion point.")
+        chara_matches = all_chara_m
+        print("Falling back to inserting after last chara line.\n")
     last_chara = chara_matches[-1]
     # advance to end of that line
     eol = text.find('\n', last_chara.start())
