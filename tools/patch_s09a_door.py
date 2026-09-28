@@ -112,7 +112,8 @@ def main():
     ap.add_argument("mgz",  help="Path to s09a.mgz (will be patched in place)")
     ap.add_argument("--x",  type=int, default=9500,  help="Door X coordinate (default 9500)")
     ap.add_argument("--z",  type=int, default=1500,  help="Door Z coordinate (default 1500)")
-    ap.add_argument("--dry", action="store_true",    help="Print patched GCX without writing")
+    ap.add_argument("--dry",  action="store_true", help="Print patched GCX without writing")
+    ap.add_argument("--dump", action="store_true", help="Print the raw GCX text and exit")
     args = ap.parse_args()
 
     mgz_path = os.path.abspath(args.mgz)
@@ -129,6 +130,14 @@ def main():
 
     print(f"GCX: {gcx_path}  ({len(gcx_text):,} chars)")
     print(f"Door position: X={args.x}  Y=0  Z={args.z}")
+
+    if args.dump:
+        print("\n--- GCX START ---")
+        print(gcx_text[:4000])
+        if len(gcx_text) > 4000:
+            print(f"\n... ({len(gcx_text)-4000} more chars) ...")
+        print("--- GCX END ---")
+        return
 
     patched = patch_gcx(gcx_text, args.x, args.z)
 
