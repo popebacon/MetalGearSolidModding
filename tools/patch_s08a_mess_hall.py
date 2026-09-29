@@ -113,7 +113,8 @@ def main():
     ap.add_argument("mgz", help="Path to STAGE.mgz (will be patched in place)")
     ap.add_argument("--x",   type=int, default=8500, help="Door X (default 8500)")
     ap.add_argument("--z",   type=int, default=5000, help="Door Z (default 5000)")
-    ap.add_argument("--dry", action="store_true", help="Show changes without writing")
+    ap.add_argument("--dry",  action="store_true", help="Show changes without writing")
+    ap.add_argument("--dump", action="store_true", help="Print first 3000 chars of GCX and exit")
     args = ap.parse_args()
 
     mgz_path = os.path.abspath(args.mgz)
@@ -126,9 +127,23 @@ def main():
         if not gcx_path:
             print("ERROR: s08a scenerio.gcx not found in the MGZ.")
             sys.exit(1)
-        gcx_text = zin.read(gcx_path).decode("latin-1")
+        gcx_bytes = zin.read(gcx_path)
+        gcx_text = gcx_bytes.decode("latin-1")
 
     print(f"GCX : {gcx_path}  ({len(gcx_text):,} chars)")
+
+    if args.dump:
+        sample = gcx_text[:3000]
+        print("--- GCX SAMPLE (first 3000 chars) ---")
+        print(repr(sample))
+        print("--- END ---")
+        # also show printable lines
+        print("\n--- PRINTABLE LINES ---")
+        for line in gcx_text.splitlines()[:80]:
+            if all(32 <= ord(c) < 127 or c in '\t' for c in line):
+                print(repr(line))
+        return
+
     print(f"Door: strid:{DOOR_STRID}  X={args.x}  Z={args.z}")
     print(f"Loads stage '{TARGET}' with Snake spawning at ({SPAWN_X},{SPAWN_Y},{SPAWN_Z})")
 
