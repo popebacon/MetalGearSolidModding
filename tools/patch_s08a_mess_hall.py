@@ -133,15 +133,21 @@ def main():
     print(f"GCX : {gcx_path}  ({len(gcx_text):,} chars)")
 
     if args.dump:
-        sample = gcx_text[:3000]
-        print("--- GCX SAMPLE (first 3000 chars) ---")
-        print(repr(sample))
+        # List all files in s08a folder
+        with zipfile.ZipFile(mgz_path, "r") as zin:
+            s08a_files = [n for n in zin.namelist()
+                          if f"/{STAGE_NAME}/" in n.replace("\\", "/") or
+                             n.replace("\\", "/").startswith(f"{STAGE_NAME}/")]
+        print("--- FILES IN s08a ---")
+        for f in sorted(s08a_files):
+            print(f" {f}")
         print("--- END ---")
-        # also show printable lines
-        print("\n--- PRINTABLE LINES ---")
-        for line in gcx_text.splitlines()[:80]:
-            if all(32 <= ord(c) < 127 or c in '\t' for c in line):
-                print(repr(line))
+        # show embedded ASCII strings (len >= 4) from the binary
+        import re as _re
+        strings = _re.findall(rb'[ -~]{4,}', gcx_bytes)
+        print(f"\n--- EMBEDDED STRINGS ({len(strings)} found) ---")
+        for s in strings[:60]:
+            print(" ", s)
         return
 
     print(f"Door: strid:{DOOR_STRID}  X={args.x}  Z={args.z}")
