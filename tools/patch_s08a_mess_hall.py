@@ -75,11 +75,8 @@ def find_gcx(z: zipfile.ZipFile) -> str | None:
         parts = [p for p in norm.split("/") if p]
         if norm.endswith("scenerio.gcx"):
             folder = parts[-2] if len(parts) >= 2 else ""
-            if not folder.endswith("r"):
+            if folder == STAGE_NAME:
                 return name
-    for name in z.namelist():
-        if name.replace("\\", "/").endswith("scenerio.gcx"):
-            return name
     return None
 
 
