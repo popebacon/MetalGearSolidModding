@@ -18,72 +18,102 @@ Usage:
 
 import sys, os, re, argparse
 
-TARGET     = "s21a"
-DOOR_STRID = "s:50f3"
-MODEL_STR  = "s:6c6c"
-TEX_STRID  = "s:3528"
-PROC_NAME  = "sub_9A21"
-SPAWN_X    = 10500
-SPAWN_Y    = 0
-SPAWN_Z    = 0
-SPAWN_DIR  = 3072   # facing west into mess hall
+TARGET    = "s21a"
+DOOR_ID   = "door_mess"
+TRAP_A    = "tr_mess_a"
+TRAP_X    = "tr_mess_x"
+PROC_NAME = "proc_mess_load"
+MODEL_STR = "nst_dor"
+SPAWN_X   = 10500
+SPAWN_Y   = 0
+SPAWN_Z   = 0
+SPAWN_DIR = 0   # facing into mess hall; adjust if needed
 
-# New proc in Stage Editor GCL syntax
+# Proc: sets spawn position and loads s21a (trap/ntrap pattern, no -f callback)
 PROC_BLOCK = f"""
 proc {PROC_NAME} {{
-    if (arg1 == s:0dd2) {{
-        call(sub_8CD4)
-        eval($f:000001 = 0)
-        eval($w:800010 = {SPAWN_X})
-        eval($w:800012 = {SPAWN_Y})
-        eval($w:800014 = {SPAWN_Z})
-        eval($w:000002 = {SPAWN_DIR})
-        eval($w:000004 = 0)
-        load "{TARGET}" \\
-            -m s:7df9 \\
-            -s 1
-    }}
+    eval($f:000001 = false)
+    eval($w:snake_pos_x = {SPAWN_X})
+    eval($w:snake_pos_y = {SPAWN_Y})
+    eval($w:snake_pos_z = {SPAWN_Z})
+    eval($w:000002 = {SPAWN_DIR})
+    eval($w:000004 = 0)
+    load "{TARGET}" \\
+        -map   main \\
+        -s     1
 }}
 """
 
-# Door + texture in Stage Editor GCL syntax
-def make_door_lines(x, z):
-    tx = x - 250
-    tz = z + 1750
-    door = (
-        f"    chara DOOR {DOOR_STRID} \\\n"
-        f"        -p {x} 0 {z} \\\n"
-        f"        -d 0 3072 0 \\\n"
-        f"        -m {MODEL_STR} \\\n"
-        f"        -t 1 \\\n"
-        f"        -w 1500 \\\n"
-        f"        -f {PROC_NAME} \\\n"
-        f"        -e 91 88\n"
-    )
-    tex = (
-        f"    chara TEXTURE {TEX_STRID} {tx} 1800 {tz} 0 3072 0 500 400 500 \\\n"
-        f"        -I dr_lamp_off \\\n"
-        f"        -S  \\\n"
-        f"        -a s:dd19 0 5 s:dd19 dr_lamp_off 5 room 3 \\\n"
-        f"        -b s:dd19 0 5 s:dd19 dr_lamp_on 5 room 3\n"
-    )
-    return door + tex
 
-# Insert proc before "proc sub_0000"
+def make_door_block(x, z):
+    run_z = z - 1500   # point Snake runs toward before fade+load
+
+    door = (
+        f"chara DOOR {DOOR_ID} \\\n"
+        f"    -p {x},0,{z} \\\n"
+        f"    -d 0,0,0 \\\n"
+        f"    -m {MODEL_STR} \\\n"
+        f"    -t 2 \\\n"
+        f"    -w 2000 \\\n"
+        f"    -s 70 \\\n"
+        f"    -u 0 \\\n"
+        f"    -h 400 \\\n"
+        f"    -v 4000 \\\n"
+        f"    -e 93 90\n"
+    )
+    trap_a = (
+        f"trap {TRAP_A} SNAKE anything? {{\n"
+        f"    if (stack:3 == enter) {{\n"
+        f"        mesg {DOOR_ID} enter SNAKE 0 0\n"
+        f"    }} else {{\n"
+        f"        mesg {DOOR_ID} leave stack:2 stack:6 30\n"
+        f"    }}\n"
+        f"}}\n"
+    )
+    trap_x = (
+        f"ntrap {TRAP_X} SNAKE \\\n"
+        f"    -mask  enter \\\n"
+        f"    -c     \\\n"
+        f"    -exec  {{\n"
+        f"        if (stack:7 == 2) {{\n"
+        f"            mesg nikita kill\n"
+        f"        }} else {{\n"
+        f"            pad \\\n"
+        f"                -resume\n"
+        f"            sound \\\n"
+        f"                -x     snd:01ffff0b\n"
+        f"            mesg SNAKE  run_move  {x},0,{run_z}  1000,16,-1\n"
+        f"            chara FADE_IN_OUT 0x1f8b \\\n"
+        f"                -m     0 \\\n"
+        f"                -speed 30\n"
+        f"            delay \\\n"
+        f"                -time  32 \\\n"
+        f"                -exec  {{\n"
+        f"                    call({PROC_NAME})\n"
+        f"                }}\n"
+        f"        }}\n"
+        f"    }}\n"
+    )
+    return "\n" + door + "\n" + trap_a + "\n" + trap_x
+
+
+# Find the last proc block (insert our proc before proc sub_0000)
 PROC_0000_RE = re.compile(r'^proc sub_0000\b', re.MULTILINE)
 
-# Insert door+texture after the last door-style TEXTURE block
-# (lines ending with "dr_lamp_on 5 room 3")
-LAST_LAMP_TEX_RE = re.compile(
-    r'(^    chara TEXTURE \S+ .*?\\\n'
-    r'(?:        .*?\\\n)*'
-    r'        -b s:dd19 0 5 s:dd19 dr_lamp_on 5 room 3\n)',
+# Find the end of the last trap/ntrap block to insert door block after
+LAST_NTRAP_RE = re.compile(
+    r'(^ntrap\b[^\n]*\\\n(?:.*\\\n)*.*?\n\s*\}\s*\n)',
     re.MULTILINE
+)
+# Fallback: find last trap block
+LAST_TRAP_RE = re.compile(
+    r'(^trap\b[^\n]*\{[^\}]*\}\s*\n)',
+    re.MULTILINE | re.DOTALL
 )
 
 
 def patch_gcl(text: str, x: int, z: int) -> str:
-    door_tex = make_door_lines(x, z)
+    door_block = make_door_block(x, z)
 
     # 1. Insert proc block before proc sub_0000
     m = PROC_0000_RE.search(text)
@@ -94,16 +124,8 @@ def patch_gcl(text: str, x: int, z: int) -> str:
         )
     text = text[:m.start()] + PROC_BLOCK + "\n" + text[m.start():]
 
-    # 2. Insert door+texture after the last door-lamp TEXTURE block
-    matches = list(LAST_LAMP_TEX_RE.finditer(text))
-    if not matches:
-        raise ValueError(
-            "Could not find any 'chara TEXTURE ... dr_lamp_on 5 room 3' blocks.\n"
-            "Unexpected GCL structure."
-        )
-    last = matches[-1]
-    ins = last.end()
-    text = text[:ins] + door_tex + text[ins:]
+    # 2. Append door + trap blocks at the end of the file
+    text = text.rstrip('\n') + "\n\n# === Mess Hall door (s21a) ===\n" + door_block + "\n"
 
     return text
 
@@ -126,14 +148,14 @@ def main():
         text = f.read()
 
     print(f"Input : {in_path}  ({len(text):,} chars)")
-    print(f"Door  : {DOOR_STRID}  X={args.x}  Z={args.z}")
+    print(f"Door  : {DOOR_ID}  X={args.x}  Z={args.z}")
     print(f"Loads : '{TARGET}' with Snake spawning at ({SPAWN_X},{SPAWN_Y},{SPAWN_Z})")
 
     if args.dry:
         print("\n[DRY RUN] Proc block:")
         print(PROC_BLOCK)
-        print("[DRY RUN] Door + texture lines:")
-        print(make_door_lines(args.x, args.z))
+        print("[DRY RUN] Door + trap block:")
+        print(make_door_block(args.x, args.z))
         return
 
     patched = patch_gcl(text, args.x, args.z)
