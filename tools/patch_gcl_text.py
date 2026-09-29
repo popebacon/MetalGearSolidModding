@@ -61,9 +61,9 @@ TEX_LINE_TPL = (
 )
 
 # Match the last existing DOOR chara line (indented with spaces)
-LAST_DOOR_RE = re.compile(r'^[ \t]*chara\b.*DOOR:0xb997', re.MULTILINE)
-# Match "script {" or "script{" at start of line
-SCRIPT_RE    = re.compile(r'^script\s*\{', re.MULTILINE)
+LAST_DOOR_RE = re.compile(r'^[ \t]*chara\b.*DOOR:', re.MULTILINE)
+# Match "script ... {" at start of line (may have a /* comment */ between keyword and brace)
+SCRIPT_RE    = re.compile(r'^script\b[^\n]*\{', re.MULTILINE)
 
 
 def patch_gcl(text: str, x: int, z: int) -> str:
