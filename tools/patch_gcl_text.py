@@ -130,6 +130,19 @@ def main():
         print("\n--- TOP-LEVEL KEYWORDS ---")
         for kw, count in kw_counts.most_common(20):
             print(f"  {kw}: {count}")
+        # Show context around 'script'
+        import re as _re2
+        sm = _re2.search(r'^script', text, _re2.MULTILINE)
+        if sm:
+            start = max(0, sm.start() - 50)
+            end   = min(len(text), sm.start() + 200)
+            print("\n--- CONTEXT AROUND 'script' ---")
+            print(repr(text[start:end]))
+        # Show last DOOR chara line
+        dm = list(_re2.finditer(r'^.+DOOR.+', text, _re2.MULTILINE))
+        if dm:
+            print(f"\n--- LAST DOOR LINE (of {len(dm)}) ---")
+            print(repr(dm[-1].group()))
         print("\n--- FIRST 3000 CHARS ---")
         print(text[:3000])
         print("--- END ---")
