@@ -60,14 +60,14 @@ def main():
 
     out = mgz_path + ".new"
     with zipfile.ZipFile(mgz_path, "r") as zin, \
-         zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as zout:
+         zipfile.ZipFile(out, "w") as zout:
         for item in zin.infolist():
+            data = gcx_data if item.filename == target else zin.read(item.filename)
+            # preserve original compression type per entry
+            item.compress_type = zin.getinfo(item.filename).compress_type
+            zout.writestr(item, data)
             if item.filename == target:
-                zout.writestr(item, gcx_data)
                 print(f"  [INJECTED] {item.filename}  ({len(gcx_data):,} bytes)")
-            else:
-                zout.writestr(item, zin.read(item.filename))
-
     os.replace(out, mgz_path)
     print(f"\nDone. {mgz_path} updated.")
     print(f"Launch the game and enter {args.stage} to test.")
