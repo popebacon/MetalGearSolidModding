@@ -105,7 +105,8 @@ def main():
     ap.add_argument("output", nargs="?", help="Output path (default: input_patched.gcl)")
     ap.add_argument("--x",   type=int, default=8500, help="Door X coordinate (default 8500)")
     ap.add_argument("--z",   type=int, default=5000, help="Door Z coordinate (default 5000)")
-    ap.add_argument("--dry", action="store_true", help="Print what would be added, don't write")
+    ap.add_argument("--dry",  action="store_true", help="Print what would be added, don't write")
+    ap.add_argument("--dump", action="store_true", help="Print structure info and first 3000 chars, then exit")
     args = ap.parse_args()
 
     in_path = os.path.abspath(args.input)
@@ -119,6 +120,20 @@ def main():
     print(f"Input : {in_path}  ({len(text):,} chars)")
     print(f"Door  : strid:{DOOR_STRID}  X={args.x}  Z={args.z}")
     print(f"Loads : '{TARGET}' with Snake spawning at ({SPAWN_X},{SPAWN_Y},{SPAWN_Z})")
+
+    if args.dump:
+        import re as _re
+        # Show all top-level keywords found
+        top_kw = _re.findall(r'^(\w+)\b', text, _re.MULTILINE)
+        from collections import Counter
+        kw_counts = Counter(top_kw)
+        print("\n--- TOP-LEVEL KEYWORDS ---")
+        for kw, count in kw_counts.most_common(20):
+            print(f"  {kw}: {count}")
+        print("\n--- FIRST 3000 CHARS ---")
+        print(text[:3000])
+        print("--- END ---")
+        return
 
     # Quick sanity check
     if "script" not in text:
